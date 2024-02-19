@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Волк собирает яйца</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow: hidden; /* Для того, чтобы скрыть яйца, которые выходят за границы */
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 80vh; /* Изменено для плавания яиц только в этой области */
+            background-color: #b3e0ff; /* Цвет игрового поля */
+        }
+        #wolf {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px; /* Задаем размеры изображения волка */
+            height: 100px;
+        }
+        .egg {
+            position: absolute;
+            width: 50px; /* Размеры яйца */
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Волк собирает яйца</h1>
+    <div id="game-container">
+        <img id="wolf" src="2.png"> <!-- Изображение волка -->
+    </div>
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const wolf = document.getElementById('wolf');
+        let score = 0;
+        let wolfPosition = 50; // начальное положение волка
+
+        function createEgg() {
+            const egg = document.createElement('img'); // Создаем элемент img
+            egg.classList.add('egg');
+            egg.src = 'egg.png'; // Задаем путь к изображению яйца
+            const randomX = Math.random() * (gameContainer.offsetWidth - 50);
+            egg.style.left = `${randomX}px`;
+            egg.style.top = '0';
+            gameContainer.appendChild(egg);
+
+            const moveEggInterval = setInterval(() => {
+                const y = egg.offsetTop;
+                egg.style.top = `${y + 5}px`;
+                if (y > gameContainer.offsetHeight - 50) {
+                    clearInterval(moveEggInterval);
+                    egg.remove();
+                } else if (isCollision(egg, wolf)) {
+                    clearInterval(moveEggInterval);
+                    egg.remove();
+                    score++;
+                    updateScore();
+                }
+            }, 50);
+        }
+
+        function isCollision(egg, wolf) {
+            const eggRect = egg.getBoundingClientRect();
+            const wolfRect = wolf.getBoundingClientRect();
+            return !(
+                eggRect.top + eggRect.height < wolfRect.top ||
+                eggRect.top > wolfRect.top + wolfRect.height ||
+                eggRect.left + eggRect.width < wolfRect.left ||
+                eggRect.left > wolfRect.left + wolfRect.width
+            );
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = score;
+            if (score >= 5) {
+                wolf.src = '1.png'; // Заменяем изображение волка на изображение в маске
+            }
+        }
+
+        function moveWolf(event) {
+            wolf.style.left = `${wolfPosition}%`;
+        }
+
+        function handleKeyDown(event) {
+            const key = event.key;
+            if (key === 'ArrowLeft' || key === 'a') {
+                if (wolfPosition > 0) {
+                    wolfPosition -= 5;
+                }
+            } else if (key === 'ArrowRight' || key === 'd') {
+                if (wolfPosition < 100) {
+                    wolfPosition += 5;
+                }
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        setInterval(createEgg, 2000);
+        setInterval(moveWolf, 50);
+    </script>
+    <p>Счет: <span id="score">0</span></p>
+</body>
+</html>
