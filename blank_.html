@@ -12,15 +12,10 @@
         }
         #game-container {
             position: relative;
-            width: 50%;
-            height: 85vh;
-            background-color: #b3e0ff;
-            margin: 0 auto; /* Это добавленное свойство центрирует блок по горизонтали */
-            display: flex; /* Включаем flexbox */
-            justify-content: center; /* Центрируем содержимое по горизонтали */
-            align-items: center; /* Центрируем содержимое по вертикали */
+            width: 100%;
+            height: 80vh; /* Изменено для плавания яиц только в этой области */
+            background-image: url('Ася.png'); /* Цвет игрового поля */
         }
-
         #wolf {
             position: absolute;
             bottom: 20px;
@@ -34,16 +29,6 @@
             width: 50px; /* Размеры яйца */
             height: 50px;
         }
-
-        .score{
-            position:absolute;
-            left:63%;
-            bottom: 6%
-        }
-        .crash_egg{position: absolute;
-            left: 63%;
-            bottom: 10%;
-        }
     </style>
 </head>
 <body>
@@ -55,9 +40,7 @@
         const gameContainer = document.getElementById('game-container');
         const wolf = document.getElementById('wolf');
         let score = 0;
-        let eggsLeft = 3; // количество оставшихся яиц
         let wolfPosition = 50; // начальное положение волка
-        let eggSpeed = 5; // Изначальная скорость падения яиц
 
         function createEgg() {
             const egg = document.createElement('img'); // Создаем элемент img
@@ -70,15 +53,10 @@
 
             const moveEggInterval = setInterval(() => {
                 const y = egg.offsetTop;
-                egg.style.top = `${y + eggSpeed}px`; // Используем переменную eggSpeed для определения скорости падения яиц
+                egg.style.top = `${y + 5}px`;
                 if (y > gameContainer.offsetHeight - 50) {
                     clearInterval(moveEggInterval);
                     egg.remove();
-                    eggsLeft--; // Уменьшаем количество оставшихся яиц
-                    updateEggsLeft(); // Обновляем отображение оставшихся яиц
-                    if (eggsLeft <= 0) { // Проверяем, закончились ли яйца
-                        endGame(); // Если да, завершаем игру
-                    }
                 } else if (isCollision(egg, wolf)) {
                     clearInterval(moveEggInterval);
                     egg.remove();
@@ -101,13 +79,8 @@
 
         function updateScore() {
             document.getElementById('score').innerText = score;
-            if (score === 10) {
-                wolf.src = 'mask.png'; // Заменяем изображение волка на изображение в маске
-                eggSpeed = 10; // После набора 10 очков скорость увеличивается до 10
-            } else if (score === 20) {
-                eggSpeed = 15; // После набора 20 очков скорость увеличивается до 35
-            } else if (score === 30) {
-                eggSpeed = 20;
+            if (score >= 5) {
+                wolf.src = '1.png'; // Заменяем изображение волка на изображение в маске
             }
         }
 
@@ -117,34 +90,22 @@
 
         function handleKeyDown(event) {
             const key = event.key;
-            if (key === 'ArrowLeft' || key === 'A' || key === 'a' || key === 'ф') {
+            if (key === 'ArrowLeft' || key === 'a') {
                 if (wolfPosition > 0) {
                     wolfPosition -= 5;
                 }
-            } else if (key === 'ArrowRight' || key === 'D' || key === 'd' || key === 'в') {
+            } else if (key === 'ArrowRight' || key === 'd') {
                 if (wolfPosition < 100) {
                     wolfPosition += 5;
                 }
             }
         }
 
-        function endGame() {
-            alert('Вы проиграли!'); // Выводим сообщение об окончании игры
-            location.reload(); // Перезагружаем страницу для начала новой игры
-        }
-
-        function updateEggsLeft() {
-            document.getElementById('eggs-left').innerText = eggsLeft; // Обновляем отображение оставшихся яиц
-        }
-
         document.addEventListener('keydown', handleKeyDown);
 
         setInterval(createEgg, 2000);
         setInterval(moveWolf, 50);
-
     </script>
-    <p class="score">Счет: <span id="score">0</span></p>
-    <p class="crash_egg">Оставшиеся яйца: <span id="eggs-left">3</span></p> <!-- Добавлено отображение оставшихся яиц -->
+    <p>Счет: <span id="score">0</span></p>
 </body>
 </html>
--->
